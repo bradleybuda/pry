@@ -227,8 +227,8 @@ class Pry
       @method.name.to_s
     end
 
-    # Get the owner of the method as a Pry::Module
-    # @return [Pry::Module]
+    # Get the owner of the method as a Pry::WrappedModule
+    # @return [Pry::WrappedModule]
     def wrapped_owner
       @wrapped_owner ||= Pry::WrappedModule.new(owner)
     end
@@ -248,13 +248,15 @@ class Pry
       "#{wrapped_owner.method_prefix}#{name}"
     end
 
+    # @param [Boolean] raw Whether the raw source code is returned
+    #   i.e leading spaces are unstripped.
     # @return [String, nil] The source code of the method, or `nil` if it's unavailable.
-    def source
+    def source(raw=false)
       @source ||= case source_type
                   when :c
                     info = pry_doc_info
                     if info and info.source
-                      code = strip_comments_from_c_code(info.source)
+                      code = raw ? info.source : strip_comments_from_c_code(info.source)
                     end
                   when :ruby
                     # clone of MethodSource.source_helper that knows to use our
@@ -268,7 +270,7 @@ class Pry
                     rescue SyntaxError => e
                       raise MethodSource::SourceNotFoundError.new(e.message)
                     end
-                    strip_leading_whitespace(code)
+                    raw ? code : strip_leading_whitespace(code)
                   end
     end
 
@@ -400,6 +402,21 @@ class Pry
     # @return [Boolean] Was the method defined outside a source file?
     def dynamically_defined?
       !!(source_file and source_file =~ /(\(.*\))|<.*>/)
+    end
+
+    # @return [Boolean] Whether the method is unbound.
+    def unbound_method?
+      is_a?(::UnboundMethod)
+    end
+
+    # @return [Boolean] Whether the method is bound.
+    def bound_method?
+      is_a?(::Method)
+    end
+
+    # @return [Boolean] Whether the method is a singleton method.
+    def singleton_method?
+      wrapped_owner.singleton_class?
     end
 
     # @return [Boolean] Was the method defined within the Pry REPL?
