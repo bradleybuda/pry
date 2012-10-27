@@ -5,10 +5,10 @@ class Pry::Pager
   #
   # @param [:simple] pager
   #   Use the pure ruby pager.
-  #   
+  #
   # @param [:system] pager
   #   Use the system pager (less) or the environment variable $PAGER if set.
-  #   
+  #
   # @param [nil] pager
   #   Infer what pager to use from the environment.
   #   What this really means is that JRuby and systems that do not have access
@@ -55,7 +55,7 @@ class Pry::Pager
 
   class SystemPager < Pry::Pager
     def self.default_pager
-      ENV["PAGER"] || "less -R -S -F -X"
+      ENV["PAGER"] || "less -r -S -F -X"
     end
 
     def self.available?
