@@ -21,11 +21,11 @@ class Pry
 
         COLORS.each_pair do |color, value|
           define_method color do |text|
-            Pry.color ? "\033[0;#{30+value}m#{text}\033[0m" : text.to_s
+            Pry.color ? "\001\033[0;#{30+value}m\002#{text}\001\033[0m\002" : text.to_s
           end
 
           define_method "bright_#{color}" do |text|
-            Pry.color ? "\033[1;#{30+value}m#{text}\033[0m" : text.to_s
+            Pry.color ? "\001\033[1;#{30+value}m\002#{text}\001\033[0m\002" : text.to_s
           end
         end
 
@@ -43,7 +43,7 @@ class Pry
         # @param [String, #to_s] text
         # @return [String] _text_
         def bold text
-          Pry.color ? "\e[1m#{text}\e[0m" : text.to_s
+          Pry.color ? "\001\e[1m\002#{text}\001\e[0m\002" : text.to_s
         end
 
         # Returns `text` in the default foreground colour.
@@ -105,4 +105,3 @@ class Pry
 
   end
 end
-
